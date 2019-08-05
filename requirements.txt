@@ -1,0 +1,6 @@
+Django==2.2.3
+jsonfield==2.0.2
+mysqlclient==1.4.1
+requests==2.19.1
+django-split-settings==0.2.5
+django-rest-swagger==2.2.0

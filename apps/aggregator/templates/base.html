@@ -1,0 +1,39 @@
+{% load static i18n %}
+<html lang="ru">
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>Api docs {% block title %}{% endblock %}</title>
+        <link type="image/x-icon" href="/static/img/favicon.ico" rel="shortcut icon">
+        {% block css %}
+        <link href="{% static 'css/app.css' %}" rel="stylesheet">
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="/" class="navbar-brand">
+                                <img src="/static/img/logo.png">
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <footer>
+                <div class="flex">
+                    <div class="col-year">&copy;&nbsp;2018-2019</div>
+                    <div class="col-link">
+                        <a href="http://2035.university/">АНО «Университет 2035»</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        {% block js %}
+        {% endblock %}
+    </body>
+</html>

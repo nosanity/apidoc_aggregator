@@ -1,0 +1,45 @@
+.navbar-brand img {
+    height: 50px;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 20px 15px;
+}
+
+.response-col_description {
+    min-width: 500px;
+}
+
+.navbar-nav {
+    list-style-type: none;
+    padding: 0 15px;
+}
+
+body {
+    padding: 20px;
+}
+
+.flex {
+    display: flex;
+}
+
+footer a, .service-link {
+    color: #e52127;
+    text-decoration: none;
+}
+
+footer .col-year {
+    flex: 0 0 16.6%;
+    max-width: 16.6%;
+}
+
+footer .col-link {
+    flex: 0 0 83.4%;
+    max-width: 83.6%;
+}
+
+.services-list {
+    list-style-type: none;
+    padding-left: 15px;
+}
