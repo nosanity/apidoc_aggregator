@@ -8,6 +8,8 @@ import requests
 
 
 def parse_docs(service):
+    if not service.docs_url:
+        return
     try:
         resp = requests.get(service.docs_url, timeout=settings.CONNECTION_TIMEOUT)
         assert resp.ok, '{} returned {}'.format(service.docs_url, resp.status_code)
@@ -90,4 +92,4 @@ def get_paths(url, data, base_api_path, service):
 
 
 def get_security_keys(data):
-    return [list(i.keys())[0] for i in data]
+    return [list(i.keys())[0] for i in data or []]
