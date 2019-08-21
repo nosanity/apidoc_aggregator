@@ -106,3 +106,7 @@ footer .col-link {
     list-style-type: none;
     padding-left: 15px;
 }
+
+.content {
+    padding: 0 15px;
+}

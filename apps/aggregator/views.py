@@ -1,8 +1,11 @@
 import json
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView, CreateView
 from rest_framework_swagger.settings import swagger_settings
-from .models import Service
+from apps.aggregator.forms import ClientRegistrationForm
+from .models import Service, ClientRegistrationRequest
 from .utils import transform_documentation
 
 
@@ -44,3 +47,16 @@ class SystemDocumentation(TemplateView):
         if swagger_settings.VALIDATOR_URL != '':
             data['validatorUrl'] = swagger_settings.VALIDATOR_URL
         return data
+
+
+@method_decorator(login_required, name='dispatch')
+class RegisterClientView(CreateView):
+    template_name = 'client_registration.html'
+    form_class = ClientRegistrationForm
+    model = ClientRegistrationRequest
+    success_url = '/'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs

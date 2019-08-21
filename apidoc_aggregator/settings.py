@@ -122,6 +122,7 @@ SSO_UNTI_URL = ''
 # key и secret для oauth авторизации
 SOCIAL_AUTH_UNTI_KEY = ''
 SOCIAL_AUTH_UNTI_SECRET = ''
+SSO_API_KEY = ''
 
 settings_path = os.getenv('APIDOC_SETTINGS_PATH', 'local_settings.py')
 try:
