@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="content">
+    {% if not USER_SOCIAL_AUTH %}
+        {% trans "You have to log in with sso unti to create authorization token" %}
+    {% else %}
+        {% if token %}
+            {% blocktrans with code=token.key %}Your token: {{ code }}{% endblocktrans %}
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit">{% trans "Get token" %}</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'social_core',
     'social_django',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -124,6 +126,14 @@ SOCIAL_AUTH_UNTI_KEY = ''
 SOCIAL_AUTH_UNTI_SECRET = ''
 SSO_API_KEY = ''
 
+API_KEY = ''
+
+KAFKA_TOPIC = 'openapi'
+KAFKA_HOST = ''
+KAFKA_PORT = ''
+KAFKA_PROTOCOL = 'https'
+KAFKA_TOKEN = ''
+
 settings_path = os.getenv('APIDOC_SETTINGS_PATH', 'local_settings.py')
 try:
     include(settings_path)
@@ -180,3 +190,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend'
 )
 LOGIN_URL = '/login/unti/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
