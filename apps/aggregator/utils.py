@@ -41,7 +41,8 @@ def transform_documentation(service, request):
         'schemes': [gateway_url.scheme]
     })
     security_definitions = data.get('securityDefinitions') or {}
-    security_definitions = {k: service.security_overrides.get(k, v) for k, v in security_definitions.items()}
+    security_overrides = service.security_overrides or {}
+    security_definitions = {k: security_overrides.get(k, v) for k, v in security_definitions.items()}
     paths = {}
     service_paths = data.get('paths') or {}
     for path, values in service_paths.items():
@@ -76,10 +77,11 @@ def get_paths(url, data, base_api_path, service):
             continue
         security = get_security_keys(method_data.get('security'))
         names = sorted(set(security) & set(service.prefixes.keys() if service.prefixes else []))
+        service_prefixes = service.prefixes or {}
         if names:
-            service_prefix = service.prefixes[names[0]]
+            service_prefix = service_prefixes[names[0]]
         else:
-            service_prefix = service.prefixes.get('', '')
+            service_prefix = service_prefixes.get('', '')
         path = base_path[:]
         ends_with_slash = path[2].endswith('/')
         path[2] = '/'.join(map(lambda x: x.strip('/'), filter(None, [service_prefix, base_api_path, path[2]])))

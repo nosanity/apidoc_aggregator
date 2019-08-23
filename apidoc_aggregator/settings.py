@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.aggregator',
-    'rest_framework_swagger'
+    'rest_framework_swagger',
+    'social_core',
+    'social_django',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.aggregator.context_processors.context',
             ],
         },
     },
@@ -115,6 +120,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_col')
 CONNECTION_TIMEOUT = 10
 API_GATEWAY_URL = 'http://example.com'
 
+SSO_UNTI_URL = ''
+# key и secret для oauth авторизации
+SOCIAL_AUTH_UNTI_KEY = ''
+SOCIAL_AUTH_UNTI_SECRET = ''
+SSO_API_KEY = ''
+
+API_KEY = ''
+
+KAFKA_TOPIC = 'openapi'
+KAFKA_HOST = ''
+KAFKA_PORT = ''
+KAFKA_PROTOCOL = 'https'
+KAFKA_TOKEN = ''
+
 settings_path = os.getenv('APIDOC_SETTINGS_PATH', 'local_settings.py')
 try:
     include(settings_path)
@@ -164,4 +183,16 @@ DATABASES = {
             'CHARSET': 'UTF8',
         },
     }
+}
+
+AUTHENTICATION_BACKENDS = (
+    'apps.aggregator.auth.UNTIBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
+LOGIN_URL = '/login/unti/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }

@@ -6,6 +6,7 @@
         <link type="image/x-icon" href="/static/img/favicon.ico" rel="shortcut icon">
         {% block css %}
         <link href="{% static 'css/app.css' %}" rel="stylesheet">
+        <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
         {% endblock %}
     </head>
     <body>
@@ -18,6 +19,42 @@
                                 <img src="/static/img/logo.png">
                             </a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav nav-row ml-auto">
+                        {% if request.user.is_authenticated %}
+                            {% if USER_SOCIAL_AUTH.extra_data.image %}
+                                <li class="nav-item nav-user-image">
+                                    <img src="{{ USER_SOCIAL_AUTH.extra_data.image.Small }}"/>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <ul class="navbar-nav nav-user-info">
+                                    <li class="nav-item">
+                                        <div>
+                                            <div class="md-hide">
+                                                <span class="color-grey">{{ request.user.get_full_name }}</span>
+                                            </div>
+                                            <div>
+                                                <div class="nav-leader-id-container">
+                                                    <span class="badge badge-leader-id">L{{ USER_SOCIAL_AUTH.extra_data.leader_id }}</span>
+                                                </div>
+                                                <div class="ml-auto nav-logout-btn-container">
+                                                    <a href="{% url 'logout' %}" title="{% blocktrans %}Sign out{% endblocktrans %}">
+                                                        <i class="fa fa-sign-out color-grey" title="{% blocktrans %}Sign out{% endblocktrans %}"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link navbar-red" href="{% url 'social:begin' backend='unti' %}?next={{ request.path }}">
+                                    {% blocktrans %}Sign in{% endblocktrans %}
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </header>

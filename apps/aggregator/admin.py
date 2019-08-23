@@ -1,9 +1,11 @@
 import json
+import logging
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from .models import Service
+from apps.aggregator.api import SSOApi, ApiError
+from .models import Service, ClientRegistrationRequest
 from .utils import parse_docs
 
 
@@ -72,3 +74,33 @@ class ServiceAdmin(admin.ModelAdmin):
         for service in queryset:
             parse_docs(service)
     update_docs.short_description = _('Update documentation')
+
+
+@admin.register(ClientRegistrationRequest)
+class RegistrationRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'redirect_uri', 'status', 'created_at', 'updated_at')
+    readonly_fields = ('user', 'redirect_uri')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj and obj.status == ClientRegistrationRequest.STATUS_ACCEPTED:
+            fields += ('status', )
+        return fields
+
+    def save_model(self, request, obj, form, change):
+        old_status = ClientRegistrationRequest.objects.get(id=obj.id).status
+        if obj.status == ClientRegistrationRequest.STATUS_ACCEPTED:
+            try:
+                SSOApi().create_oauth_client(obj.redirect_uri, obj.user.email)
+            except ApiError:
+                logging.exception('Failed to create oauth client')
+                obj.status = old_status
+                self.message_user(request, _('Failed to create oauth client: communication with sso failed'),
+                                  messages.ERROR)
+        super().save_model(request, obj, form, change)
