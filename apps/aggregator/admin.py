@@ -19,6 +19,7 @@ class ServiceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['docs_url'].required = False
+        self.fields['prefixes'].required = True
 
     def clean(self):
         data = super().clean()
@@ -43,6 +44,14 @@ class ServiceForm(forms.ModelForm):
             except:
                 raise forms.ValidationError(_('Invalid data'))
         return data
+
+    def clean_prefixes(self):
+        val = self.cleaned_data.get('prefixes')
+        if val and not isinstance(val, dict):
+            raise forms.ValidationError(_('Value must be dict'))
+        if val and not val.get(''):
+            raise forms.ValidationError(_('Default route with key "" must be defined'))
+        return val
 
     def save(self, commit=False):
         obj = super().save(commit=False)
