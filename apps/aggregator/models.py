@@ -34,6 +34,8 @@ class ClientRegistrationRequest(models.Model):
     ))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    reviewed_by = models.ForeignKey(get_user_model(), related_name='reviewed_clients', on_delete=models.CASCADE,
+                                    null=True, blank=True, default=None)
 
 
 class KongTokenId(models.Model):

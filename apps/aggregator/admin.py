@@ -87,8 +87,9 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(ClientRegistrationRequest)
 class RegistrationRequestAdmin(admin.ModelAdmin):
-    list_display = ('user', 'redirect_uri', 'status', 'created_at', 'updated_at')
-    readonly_fields = ('user', 'redirect_uri')
+    list_display = ('user', 'redirect_uri', 'status', 'created_at', 'updated_at', 'reviewed_by')
+    readonly_fields = ('user', 'redirect_uri', 'reviewed_by')
+    list_filter = ('status', )
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -96,9 +97,14 @@ class RegistrationRequestAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.status != ClientRegistrationRequest.STATUS_REVIEW:
+            return False
+        return True
+
     def get_readonly_fields(self, request, obj=None):
         fields = super().get_readonly_fields(request, obj=obj)
-        if obj and obj.status == ClientRegistrationRequest.STATUS_ACCEPTED:
+        if obj and obj.status != ClientRegistrationRequest.STATUS_REVIEW:
             fields += ('status', )
         return fields
 
@@ -107,9 +113,12 @@ class RegistrationRequestAdmin(admin.ModelAdmin):
         if obj.status == ClientRegistrationRequest.STATUS_ACCEPTED:
             try:
                 SSOApi().create_oauth_client(obj.redirect_uri, obj.user.email)
+                obj.reviewed_by = request.user
             except ApiError:
                 logging.exception('Failed to create oauth client')
                 obj.status = old_status
                 self.message_user(request, _('Failed to create oauth client: communication with sso failed'),
                                   messages.ERROR)
+        elif obj.status == ClientRegistrationRequest.STATUS_DECLINED:
+            obj.reviewed_by = request.user
         super().save_model(request, obj, form, change)
