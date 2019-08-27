@@ -69,6 +69,12 @@ class SSOApi(BaseApi):
             'email': email,
         }, return_json=False)
 
+    def decline_oauth_client(self, redirect_uri, email):
+        return self.request('/api/decline-oauth-client/', method='POST', json={
+            'redirect_uri': redirect_uri,
+            'email': email,
+        }, return_json=False)
+
 
 class KongApi(BaseApi):
     name = 'kong'

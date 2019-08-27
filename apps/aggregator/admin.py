@@ -120,5 +120,9 @@ class RegistrationRequestAdmin(admin.ModelAdmin):
                 self.message_user(request, _('Failed to create oauth client: communication with sso failed'),
                                   messages.ERROR)
         elif obj.status == ClientRegistrationRequest.STATUS_DECLINED:
+            try:
+                SSOApi().decline_oauth_client(obj.redirect_uri, obj.user.email)
+            except ApiError:
+                self.message_user(request, _('Failed to send acknowledgement message to user'), messages.ERROR)
             obj.reviewed_by = request.user
         super().save_model(request, obj, form, change)
