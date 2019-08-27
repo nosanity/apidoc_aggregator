@@ -3,8 +3,13 @@
 
 {% block content %}
 <div class="content">
+    <p>
+        {% blocktrans trimmed %}
+        Используя токен, вы получаете доступ к открытому API Университета 20.35
+        {% endblocktrans %}
+    </p>
     {% if not USER_SOCIAL_AUTH %}
-        {% trans "You have to log in with sso unti to create authorization token" %}
+        {% trans "Необходимо залогиниться через sso для того, чтобы получить токен" %}
     {% else %}
         {% if error %}
             <div>
@@ -12,11 +17,11 @@
             </div>
         {% endif %}
         {% if token %}
-            {% blocktrans with code=token.key %}Your token: {{ code }}{% endblocktrans %}
+            {% blocktrans with code=token.key %}Ваш токен: {{ code }}{% endblocktrans %}
         {% else %}
             <form method="post">
                 {% csrf_token %}
-                <button type="submit">{% trans "Get token" %}</button>
+                <button type="submit">{% trans "Получить токен" %}</button>
             </form>
         {% endif %}
     {% endif %}

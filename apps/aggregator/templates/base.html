@@ -20,6 +20,14 @@
                             </a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav nav-menu">
+                        <li class="nav-item">
+                            <a href="{% url 'get-token' %}">{% trans "запросить токен" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'register-client' %}">{% trans "регистрация oauth2 клиента" %}</a>
+                        </li>
+                    </ul>
                     <ul class="navbar-nav nav-row ml-auto">
                         {% if request.user.is_authenticated %}
                             {% if USER_SOCIAL_AUTH.extra_data.image %}

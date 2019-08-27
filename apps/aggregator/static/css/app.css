@@ -65,6 +65,22 @@
     background-color: #737373 !important;
 }
 
+.nav-menu li {
+    margin-top: 10px;
+}
+
+.nav-menu a {
+    margin-left: 10px;
+    margin-right: 10px;
+    text-decoration: none;
+    color: black;
+    padding: 5px 10px;
+}
+
+.nav-menu a:hover {
+    background-color: #f8f9fa;
+}
+
 footer {
     margin-top: 20px;
     padding: 20px 15px;

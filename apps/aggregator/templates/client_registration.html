@@ -3,10 +3,16 @@
 
 {% block content %}
 <div class="content">
+    <p>
+        {% blocktrans trimmed %}
+        Для входа в ваше приложение через Университет 20.35 укажите redirect url приложения.
+        После рассмотрения вашей заявки, вам на почту будет отправлено письмо.
+        {% endblocktrans %}
+    </p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">{% trans "Send" %}</button>
+        <button type="submit">{% trans "Отправить" %}</button>
     </form>
 </div>
 {% endblock %}
