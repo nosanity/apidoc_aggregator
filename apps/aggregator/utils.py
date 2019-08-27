@@ -6,6 +6,9 @@ from django.utils import timezone
 
 import requests
 
+from apps.aggregator.api import KongApi, ApiError
+from apps.aggregator.models import KongTokenId
+
 
 def parse_docs(service):
     if not service.docs_url:
@@ -95,3 +98,43 @@ def get_paths(url, data, base_api_path, service):
 
 def get_security_keys(data):
     return [list(i.keys())[0] for i in data or []]
+
+
+def add_kong_token(user, key):
+    try:
+        resp = KongApi().set_api_key_for_consumer(settings.PUBLIC_KONG_CONSUMER, 'Token {}'.format(key))
+    except ApiError:
+        return False
+    if resp.status_code == 404:
+        if not create_kong_public_consumer():
+            return False
+        try:
+            resp = KongApi().set_api_key_for_consumer(settings.PUBLIC_KONG_CONSUMER, 'Token {}'.format(key))
+        except ApiError:
+            return False
+    if not resp.ok:
+        logging.error('Failed to add token for consumer, status_code %s: %s', resp.status_code, resp.content)
+        return False
+    KongTokenId.objects.update_or_create(user=user, defaults={'kong_id': resp.json()['id']})
+    return True
+
+
+def create_kong_public_consumer():
+    try:
+        resp = KongApi().create_consumer(settings.PUBLIC_KONG_CONSUMER)
+        assert resp.ok, 'status_code %s: %s' % (resp.status_code, resp.content)
+    except ApiError:
+        return False
+    except AssertionError:
+        logging.exception('Failed to create kong user')
+        return False
+
+    try:
+        resp = KongApi().add_group_for_consumer(settings.PUBLIC_KONG_CONSUMER, settings.PUBLIC_KONG_GROUP)
+        # проверка того, что пользователь успешно добавлен в группу сейчас или уже был в ней
+        if not (resp.ok or (resp.status_code == 409 and resp.json()['code'] == 5)):
+            logging.error('Failed to add kong user to group, status_code %s: %s', resp.status_code, resp.content)
+            return False
+    except ApiError:
+        return False
+    return True

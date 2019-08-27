@@ -119,6 +119,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_col')
 
 CONNECTION_TIMEOUT = 10
 API_GATEWAY_URL = 'http://example.com'
+KONG_API_URL = ''
 
 SSO_UNTI_URL = ''
 # key и secret для oauth авторизации
@@ -133,6 +134,10 @@ KAFKA_HOST = ''
 KAFKA_PORT = ''
 KAFKA_PROTOCOL = 'https'
 KAFKA_TOKEN = ''
+
+SUPPORT_EMAIL = ''
+PUBLIC_KONG_CONSUMER = 'unti_users'
+PUBLIC_KONG_GROUP = 'public'
 
 settings_path = os.getenv('APIDOC_SETTINGS_PATH', 'local_settings.py')
 try:

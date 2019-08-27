@@ -34,3 +34,11 @@ class ClientRegistrationRequest(models.Model):
     ))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class KongTokenId(models.Model):
+    """
+    модель для отслеживания соответствия authtoken.Token - id ключа в конге для упрощения апдейта ключей
+    """
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    kong_id = models.CharField(max_length=50)

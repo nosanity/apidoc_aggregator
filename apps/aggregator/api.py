@@ -38,8 +38,11 @@ class BaseApi:
         if not self.verify:
             kwargs.setdefault('verify', False)
         try:
+            raw_response = kwargs.pop('raw_response', False)
             return_json = kwargs.pop('return_json', True)
             resp = requests.request(method, url, **kwargs)
+            if raw_response:
+                return resp
             assert resp.ok, 'status_code %s' % resp.status_code
             if return_json:
                 return resp.json()
@@ -65,3 +68,32 @@ class SSOApi(BaseApi):
             'redirect_uri': redirect_uri,
             'email': email,
         }, return_json=False)
+
+
+class KongApi(BaseApi):
+    name = 'kong'
+    base_url = settings.KONG_API_URL.rstrip('/')
+
+    def create_consumer(self, username):
+        return self.request(
+            '/consumers/{}/'.format(username),
+            method='PUT',
+            json={'username': username},
+            raw_response=True,
+        )
+
+    def set_api_key_for_consumer(self, username, key):
+        return self.request(
+            '/consumers/{}/key-auth/'.format(username),
+            method='POST',
+            json={'key': key},
+            raw_response=True,
+        )
+
+    def add_group_for_consumer(self, username, group):
+        return self.request(
+            '/consumers/{}/acls/'.format(username),
+            method='POST',
+            json={'group': group},
+            raw_response=True,
+        )

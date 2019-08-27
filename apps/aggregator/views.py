@@ -2,8 +2,10 @@ import json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView, CreateView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import BasePermission
@@ -13,7 +15,7 @@ from apps.aggregator.forms import ClientRegistrationForm
 from apps.aggregator.kafka import send_object_info, KafkaActions
 from apps.aggregator.models import Service, ClientRegistrationRequest
 from apps.aggregator.serializers import UserTokenSerializer
-from apps.aggregator.utils import transform_documentation
+from apps.aggregator.utils import transform_documentation, add_kong_token
 
 
 class ApiKeyPermission(BasePermission):
@@ -92,9 +94,21 @@ class GetToken(TemplateView):
     def post(self, request):
         if not request.user.social_auth.filter(provider='unti').exists():
             raise PermissionDenied
-        token = Token.objects.create(user=request.user)
-        send_object_info(token, token.pk, KafkaActions.CREATE)
-        return self.get(request)
+        error = ''
+        # TODO: обновление токена
+        if not Token.objects.filter(user=request.user).exists():
+            with transaction.atomic():
+                token = Token.objects.create(user=request.user)
+                consumer_created = add_kong_token(request.user, token.key)
+                if not consumer_created:
+                    token.delete()
+                    token = None
+                    error = _('При генерации токена возникла ошибка, пожалуйста, повторите запрос. '
+                              'При повторном возникновении ошибки обратитесь в саппорт {support_email}')\
+                        .format(support_email=settings.SUPPORT_EMAIL)
+            if token is not None:
+                send_object_info(token, token.pk, KafkaActions.CREATE)
+        return self.render_to_response(self.get_context_data(error=error))
 
 
 class UserTokenView(ReadOnlyModelViewSet):

@@ -6,6 +6,11 @@
     {% if not USER_SOCIAL_AUTH %}
         {% trans "You have to log in with sso unti to create authorization token" %}
     {% else %}
+        {% if error %}
+            <div>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
         {% if token %}
             {% blocktrans with code=token.key %}Your token: {{ code }}{% endblocktrans %}
         {% else %}
