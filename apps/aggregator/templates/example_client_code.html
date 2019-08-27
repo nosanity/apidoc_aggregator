@@ -1,0 +1,38 @@
+<pre><code class="lang-python"><span class="hljs-keyword">from</span> social.backends.oauth <span class="hljs-keyword">import</span> BaseOAuth2
+
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UNTIBackend</span><span class="hljs-params">(BaseOAuth2)</span>:</span>
+
+    name = <span class="hljs-string">'sso_unti-oauth2'</span>
+    ID_KEY = <span class="hljs-string">'username'</span>
+    AUTHORIZATION_URL = <span class="hljs-string">'{}/oauth2/authorize'</span>.format(settings.SSO_UNTI_URL)
+    ACCESS_TOKEN_URL = <span class="hljs-string">'{}/oauth2/access_token'</span>.format(settings.SSO_UNTI_URL)
+    USER_DATA_URL = <span class="hljs-string">'{url}/oauth2/access_token/{access_token}/'</span>
+    DEFAULT_SCOPE = []
+    REDIRECT_STATE = <span class="hljs-keyword">False</span>
+    ACCESS_TOKEN_METHOD = <span class="hljs-string">'POST'</span>
+
+    PIPELINE = (
+        <span class="hljs-string">'social.pipeline.social_auth.social_details'</span>,
+        <span class="hljs-string">'social.pipeline.social_auth.social_uid'</span>,
+        <span class="hljs-string">'social.pipeline.social_auth.auth_allowed'</span>,
+        <span class="hljs-string">'social.pipeline.social_auth.social_user'</span>,
+        <span class="hljs-string">'social.pipeline.user.get_username'</span>,
+        <span class="hljs-string">'social.pipeline.user.create_user'</span>,
+        <span class="hljs-string">'social.pipeline.social_auth.associate_user'</span>,
+        <span class="hljs-string">'social.pipeline.social_auth.load_extra_data'</span>,
+        <span class="hljs-string">'social.pipeline.user.user_details'</span>,
+    )
+
+    skip_email_verification = <span class="hljs-keyword">True</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_user_details</span><span class="hljs-params">(self, response)</span>:</span>
+        <span class="hljs-keyword">return</span> response
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">user_data</span><span class="hljs-params">(self, access_token, *args, **kwargs)</span>:</span>
+        <span class="hljs-keyword">return</span> self.get_json(
+            <span class="hljs-string">'{}/users/me'</span>.format(settings.SSO_UNTI_URL),
+            params={<span class="hljs-string">'access_token'</span>: access_token},
+            headers={<span class="hljs-string">'Authorization'</span>: <span class="hljs-string">'Bearer {}'</span>.format(access_token)},
+        )
+</code></pre>

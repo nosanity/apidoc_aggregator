@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block content %}
 <div class="content">
@@ -14,5 +14,75 @@
         {{ form.as_p }}
         <button type="submit">{% trans "Отправить" %}</button>
     </form>
+
+    <div>
+        <p>
+            {% blocktrans trimmed %}
+            При аутентификации веб-приложений, во время прямого взаимодействия с пользователем используется
+            аутентификация при помощи OAuth2, и в этом случае информацию из профиля пользователя можно получить
+            по ссылке users/me.
+            {% endblocktrans %}
+        </p>
+
+        <p>
+            {% blocktrans trimmed %}Эндпоинты:{% endblocktrans %}
+            <br>
+            {% blocktrans trimmed %}начало процесса авторизации{% endblocktrans %}
+            <br>
+            GET /oauth2/authorize?client_id=APP_ID&redirect_uri=REDIRECT_URI&response_type=code
+            <br>
+            {% blocktrans trimmed %}
+            APP_ID - идентификатор приложения, зарегистрированного в sso, REDIRECT_URI - адрес, на который
+            будет передан code.
+            {% endblocktrans %}
+        </p>
+
+        <p>
+            {% blocktrans trimmed %}получение access_token{% endblocktrans %}
+            <br>
+            POST /oauth2/access_token
+            <br>
+            {% blocktrans trimmed %}Тело запроса:{% endblocktrans %}
+            <br>
+            client_id=APP_ID&client_secret=APP_SECRET&code=YOUR_CODE_FROM_AUTHORIZE&grant_type=authorization_code&redirect_uri=REDIRECT_URI
+            <br>
+            {% blocktrans trimmed %}Формат запроса: Content-Type x-www-form-urlencoded{% endblocktrans %}
+        </p>
+
+        <p>
+            {% blocktrans trimmed %}запрос данных пользователя{% endblocktrans %}
+            <br>
+            GET /users/me
+            <br>
+            {% blocktrans trimmed %}
+            в хедере запроса прописать Authorization: Bearer ACCESS_TOKEN2111111111111111111111111112222222222222222222
+            {% endblocktrans %}
+        </p>
+
+        <p>
+            {% blocktrans trimmed %}формат ответа:{% endblocktrans %}
+            <ul>
+                <li>unti_id (int) {% trans "id пользователя" %}</li>
+                <li>username (str) {% trans "логин" %}</li>
+                <li>email (str) {% trans "емейл" %}</li>
+                <li>image (dict) {% trans "словарь, где ключи это разрешение картинки, а значения - url этой картинки" %}</li>
+                <li>lastname (str) {% trans "фамилия" %}</li>
+                <li>firstname (str) {% trans "имя" %}</li>
+                <li>secondname (str) {% trans "отчество" %}</li>
+                <li>gender (str) male|female</li>
+                <li>date_of_birth (str) {% trans "формат %d.%m.%Y" %}</li>
+                <li>tel (list) {% trans "список телефонных номеров" %}</li>
+                <li>job (dict)</li>
+            </ul>
+        </p>
+
+        <p>{% trans "Пример бэкенда для python" %} <a href="https://pastebin.com/F3Z5MFSz">https://pastebin.com/F3Z5MFSz</a></p>
+    </div>
+    <div>{% include 'example_client_code.html' %}</div>
 </div>
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="{% static 'css/xcode.css' %}" rel="stylesheet">
 {% endblock %}
